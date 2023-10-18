@@ -10,6 +10,10 @@ const app = express();
 app.use(cors());
 const port = 8080;
 
+app.get("/test", async (req, res) => {
+  res.send("Test Success");
+});
+
 app.get("/get-habits", async (req, res) => {
   const { type } = req.query;
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
