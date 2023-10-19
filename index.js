@@ -53,6 +53,7 @@ app.post("/complete-habit", jsonParser, async (req, res) => {
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   const HabitsCollection = mongo.db("HabitBS").collection("Habits");
   const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
+  const UsersCollection = mongo.db("HabitBS").collection("Users");
 
   const habit = await HabitsCollection.findOne({ _id: habitObjectId });
 
