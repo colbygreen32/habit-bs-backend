@@ -15,23 +15,21 @@ app.get("/test", async (req, res) => {
 });
 
 app.get("/get-habits", async (req, res) => {
-  const { type } = req.query;
+  const { type, user_id } = req.query;
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   const HabitsCollection = mongo.db("HabitBS").collection("Habits");
-  let habits = await HabitsCollection.find({ type }).toArray();
+  let habits = await HabitsCollection.find({ user_id: new ObjectId("652eed888b89b28bc1e8d0fc"), type }).toArray();
   res.send(habits);
 });
 
 app.get("/transactions", async (req, res) => {
-  const ipIndex = req.rawHeaders.indexOf("X-Forwarded-For");
-  const userIp = req.rawHeaders[ipIndex + 1];
+  const { user_id } = req.query;
 
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
-  const UsersCollection = mongo.db("HabitBS").collection("Users");
   const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
-
-  const user = await UsersCollection.findOne({ ip: userIp });
-  const transactions = await TransactionsCollection.find({ user_id: user._id }).sort({ date: -1 }).toArray();
+  const transactions = await TransactionsCollection.find({ user_id: new ObjectId(user_id) })
+    .sort({ date: -1 })
+    .toArray();
 
   return res.send(transactions);
 });
@@ -48,17 +46,13 @@ app.get("/get-user", async (req, res) => {
 });
 
 app.post("/complete-habit", jsonParser, async (req, res) => {
-  const ipIndex = req.rawHeaders.indexOf("X-Forwarded-For");
-  const userIp = req.rawHeaders[ipIndex + 1];
   const { habitId } = req.body;
+  const { user_id } = req.query;
 
   const habitObjectId = new ObjectId(habitId);
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   const HabitsCollection = mongo.db("HabitBS").collection("Habits");
   const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
-  const UsersCollection = mongo.db("HabitBS").collection("Users");
-
-  const user = await UsersCollection.findOne({ ip: userIp });
   if (!user) {
     res.status(400).send("Error");
   }
@@ -70,7 +64,7 @@ app.post("/complete-habit", jsonParser, async (req, res) => {
     habit_name: habit.name,
     amount: habit.amount,
     credit: habit.type === "positive",
-    user_id: user._id,
+    user_id: new Object(user_id),
     date: new Date()
   });
 
