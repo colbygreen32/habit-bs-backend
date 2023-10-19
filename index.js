@@ -63,7 +63,8 @@ app.post("/complete-habit", jsonParser, async (req, res) => {
     amount: habit.amount,
     credit: habit.type === "positive",
     user_id: new ObjectId(user_id),
-    date: new Date()
+    date: new Date(),
+    type: habit.type
   });
 
   await UsersCollection.updateOne({ _id: new ObjectId(user_id) }, { $inc: { balance: habit.type === "positive" ? habit.amount : habit.amount * -1 } });
