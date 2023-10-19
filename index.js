@@ -37,11 +37,10 @@ app.get("/transactions", async (req, res) => {
 });
 
 app.get("/get-user", async (req, res) => {
+  const { user_id } = req.query;
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   const UsersCollection = mongo.db("HabitBS").collection("Users");
-  const ipIndex = req.rawHeaders.indexOf("X-Forwarded-For");
-  const userIp = req.rawHeaders[ipIndex + 1];
-  const user = await UsersCollection.findOne({ ip: userIp });
+  const user = await UsersCollection.findOne({ _id: new ObjectId(user_id) });
   if (!user) {
     return res.status(400).send("Error");
   }
