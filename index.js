@@ -61,6 +61,7 @@ app.post("/complete-habit", jsonParser, async (req, res) => {
     habit_id: habit._id,
     habit_name: habit.name,
     amount: habit.amount,
+    icon: habit.icon,
     credit: habit.type === "positive",
     user_id: new ObjectId(user_id),
     date: new Date(),
