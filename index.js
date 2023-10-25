@@ -11,7 +11,7 @@ app.use(cors());
 const port = 8080;
 
 app.get("/test", async (req, res) => {
-  res.send("Test Success");
+  return res.send("Test Success");
 });
 
 app.get("/get-habits", async (req, res) => {
@@ -19,7 +19,7 @@ app.get("/get-habits", async (req, res) => {
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   const HabitsCollection = mongo.db("HabitBS").collection("Habits");
   let habits = await HabitsCollection.find({ user_id: new ObjectId(user_id), type }).toArray();
-  res.send(habits);
+  return res.send(habits);
 });
 
 app.get("/transactions", async (req, res) => {
@@ -70,7 +70,7 @@ app.post("/complete-habit", jsonParser, async (req, res) => {
 
   await UsersCollection.updateOne({ _id: new ObjectId(user_id) }, { $inc: { balance: habit.type === "positive" ? habit.amount : habit.amount * -1 } });
 
-  res.send("Success");
+  return res.send("Success");
 });
 
 app.listen(port, () => {
