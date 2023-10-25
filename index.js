@@ -57,6 +57,11 @@ app.post("/complete-habit", jsonParser, async (req, res) => {
 
   const habit = await HabitsCollection.findOne({ _id: habitObjectId });
 
+  const user = await UsersCollection.findOne({ _id: new ObjectId(user_id) });
+  if (!user) throw new Error("No user found");
+
+  const newBalance = user.balance + (habit.type === "positive" ? habit.amount : habit.amount * -1);
+
   await TransactionsCollection.insertOne({
     habit_id: habit._id,
     habit_name: habit.name,
@@ -65,10 +70,12 @@ app.post("/complete-habit", jsonParser, async (req, res) => {
     credit: habit.type === "positive",
     user_id: new ObjectId(user_id),
     date: new Date(),
-    type: habit.type
+    type: habit.type,
+    balance_after_transaction: newBalance,
+    balance_before_transaction: user.balance
   });
 
-  await UsersCollection.updateOne({ _id: new ObjectId(user_id) }, { $inc: { balance: habit.type === "positive" ? habit.amount : habit.amount * -1 } });
+  await UsersCollection.updateOne({ _id: new ObjectId(user_id) }, { $set: { balance: newBalance } });
 
   return res.send("Success");
 });
