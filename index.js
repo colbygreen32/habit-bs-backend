@@ -16,68 +16,91 @@ app.get("/test", async (req, res) => {
 
 app.get("/get-habits", async (req, res) => {
   const { type, user_id } = req.query;
-  const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
-  const HabitsCollection = mongo.db("HabitBS").collection("Habits");
-  let habits = await HabitsCollection.find({ user_id: new ObjectId(user_id), type }).toArray();
-  return res.send(habits);
+  try {
+    const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
+    const HabitsCollection = mongo.db("HabitBS").collection("Habits");
+    let habits = await HabitsCollection.find({ user_id: new ObjectId(user_id), type }).toArray();
+    return res.send(habits);
+  } catch (error) {
+    return res.status(400).send(error.message);
+  } finally {
+    await mongo.close();
+  }
 });
 
 app.get("/transactions", async (req, res) => {
-  const { user_id } = req.query;
-
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
-  const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
-  const transactions = await TransactionsCollection.find({ user_id: new ObjectId(user_id) })
-    .sort({ date: -1 })
-    .toArray();
+  try {
+    const { user_id } = req.query;
+    const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
+    const transactions = await TransactionsCollection.find({ user_id: new ObjectId(user_id) })
+      .sort({ date: -1 })
+      .toArray();
 
-  return res.send(transactions);
+    return res.send(transactions);
+  } catch (error) {
+    return res.status(400).send(error.message);
+  } finally {
+    await mongo.close();
+  }
 });
 
 app.get("/get-user", async (req, res) => {
-  const { user_id } = req.query;
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
-  const UsersCollection = mongo.db("HabitBS").collection("Users");
-  const user = await UsersCollection.findOne({ _id: new ObjectId(user_id) });
-  if (!user) {
-    return res.status(400).send("Error");
+  try {
+    const { user_id } = req.query;
+    const UsersCollection = mongo.db("HabitBS").collection("Users");
+    const user = await UsersCollection.findOne({ _id: new ObjectId(user_id) });
+    if (!user) {
+      return res.status(400).send("Error");
+    }
+    return res.send(user);
+  } catch (error) {
+    return res.status(400).send(error.message);
+  } finally {
+    await mongo.close();
   }
-  return res.send(user);
 });
 
 app.post("/complete-habit", jsonParser, async (req, res) => {
-  const { habitId } = req.body;
-  const { user_id } = req.query;
-
-  const habitObjectId = new ObjectId(habitId);
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
-  const HabitsCollection = mongo.db("HabitBS").collection("Habits");
-  const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
-  const UsersCollection = mongo.db("HabitBS").collection("Users");
+  try {
+    const { habitId } = req.body;
+    const { user_id } = req.query;
 
-  const habit = await HabitsCollection.findOne({ _id: habitObjectId });
+    const habitObjectId = new ObjectId(habitId);
+    const HabitsCollection = mongo.db("HabitBS").collection("Habits");
+    const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
+    const UsersCollection = mongo.db("HabitBS").collection("Users");
 
-  const user = await UsersCollection.findOne({ _id: new ObjectId(user_id) });
-  if (!user) throw new Error("No user found");
+    const habit = await HabitsCollection.findOne({ _id: habitObjectId });
 
-  const newBalance = user.balance + (habit.type === "positive" ? habit.amount : habit.amount * -1);
+    const user = await UsersCollection.findOne({ _id: new ObjectId(user_id) });
+    if (!user) throw new Error("No user found");
 
-  await TransactionsCollection.insertOne({
-    habit_id: habit._id,
-    habit_name: habit.name,
-    amount: habit.amount,
-    icon: habit.icon,
-    credit: habit.type === "positive",
-    user_id: new ObjectId(user_id),
-    date: new Date(),
-    type: habit.type,
-    balance_after_transaction: newBalance,
-    balance_before_transaction: user.balance
-  });
+    const newBalance = user.balance + (habit.type === "positive" ? habit.amount : habit.amount * -1);
 
-  await UsersCollection.updateOne({ _id: new ObjectId(user_id) }, { $set: { balance: newBalance } });
+    await TransactionsCollection.insertOne({
+      habit_id: habit._id,
+      habit_name: habit.name,
+      amount: habit.amount,
+      icon: habit.icon,
+      credit: habit.type === "positive",
+      user_id: new ObjectId(user_id),
+      date: new Date(),
+      type: habit.type,
+      balance_after_transaction: newBalance,
+      balance_before_transaction: user.balance
+    });
 
-  return res.send("Success");
+    await UsersCollection.updateOne({ _id: new ObjectId(user_id) }, { $set: { balance: newBalance } });
+
+    return res.send("Success");
+  } catch (error) {
+    return res.status(400).send(error.message);
+  } finally {
+    await mongo.close();
+  }
 });
 
 app.listen(port, () => {
