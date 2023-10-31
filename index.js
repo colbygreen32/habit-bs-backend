@@ -15,9 +15,9 @@ app.get("/test", async (req, res) => {
 });
 
 app.get("/get-habits", async (req, res) => {
-  const { type, user_id } = req.query;
+  const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   try {
-    const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
+    const { type, user_id } = req.query;
     const HabitsCollection = mongo.db("HabitBS").collection("Habits");
     let habits = await HabitsCollection.find({ user_id: new ObjectId(user_id), type }).toArray();
     return res.send(habits);
