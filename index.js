@@ -65,7 +65,7 @@ app.get("/get-user", async (req, res) => {
 app.post("/complete-habit", jsonParser, async (req, res) => {
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   try {
-    const { habitId } = req.body;
+    const { habitId, hours } = req.body;
     const { user_id } = req.query;
 
     const habitObjectId = new ObjectId(habitId);
@@ -78,12 +78,17 @@ app.post("/complete-habit", jsonParser, async (req, res) => {
     const user = await UsersCollection.findOne({ _id: new ObjectId(user_id) });
     if (!user) throw new Error("No user found");
 
-    const newBalance = user.balance + (habit.type === "positive" ? habit.amount : habit.amount * -1);
+    let amount = habit.type === "positive" ? habit.amount : habit.amount * -1;
+    if (hours) {
+      amount = amount * hours;
+    }
+    const newBalance = user.balance + amount;
 
     await TransactionsCollection.insertOne({
+      hours,
       habit_id: habit._id,
       habit_name: habit.name,
-      amount: habit.amount,
+      amount: amount,
       icon: habit.icon,
       credit: habit.type === "positive",
       user_id: new ObjectId(user_id),
