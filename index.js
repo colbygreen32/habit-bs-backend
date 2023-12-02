@@ -108,6 +108,29 @@ app.post("/complete-habit", jsonParser, async (req, res) => {
   }
 });
 
+app.post("/reset-transactions", jsonParser, async (req, res) => {
+  const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
+  try {
+    const { user_id } = req.query;
+
+    const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
+    const UsersCollection = mongo.db("HabitBS").collection("Users");
+
+    await TransactionsCollection.deleteMany({ user_id: new ObjectId(user_id) });
+
+    const user = await UsersCollection.findOne({ _id: new ObjectId(user_id) });
+    if (!user) throw new Error("No user found");
+
+    await UsersCollection.updateOne({ _id: new ObjectId(user_id) }, { $set: { balance: 0 } });
+
+    return res.send("Success");
+  } catch (error) {
+    return res.status(400).send(error.message);
+  } finally {
+    await mongo.close();
+  }
+});
+
 app.listen(port, () => {
   console.log(`listening on port ${port}`);
 });
