@@ -28,7 +28,9 @@ app.get("/get-habits", async (req, res) => {
     if (query_depth == "filtered") {
       console.log("filtered hit");
       const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
-      const today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+      const date = new Date();
+      console.log(date);
+      const today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
       console.log(today);
       for (const habit of habits) {
         if (!habit.redemptions_per_day) {
