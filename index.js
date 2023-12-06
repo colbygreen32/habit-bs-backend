@@ -18,6 +18,8 @@ app.get("/get-habits", async (req, res) => {
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   try {
     const { type, user_id, query_depth = "filtered" } = req.query;
+
+    console.log(type, user_id, query_depth);
     const HabitsCollection = mongo.db("HabitBS").collection("Habits");
 
     let habits = await HabitsCollection.find({ user_id: new ObjectId(user_id), type }).toArray();
