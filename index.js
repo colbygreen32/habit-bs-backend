@@ -25,10 +25,11 @@ app.get("/get-habits", async (req, res) => {
     let habits = await HabitsCollection.find({ user_id: new ObjectId(user_id), type }).toArray();
 
     let filteredHabits = [];
-    if (query_depth === "filtered") {
+    if (query_depth == "filtered") {
       console.log("filtered hit");
       const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
       const today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+      console.log(today);
       for (const habit of habits) {
         if (!habit.redemptions_per_day) {
           filteredHabits.push(habit);
