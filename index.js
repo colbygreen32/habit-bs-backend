@@ -17,9 +17,28 @@ app.get("/test", async (req, res) => {
 app.get("/get-habits", async (req, res) => {
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   try {
-    const { type, user_id } = req.query;
+    const { type, user_id, query_depth = "filtered" } = req.query;
     const HabitsCollection = mongo.db("HabitBS").collection("Habits");
+
     let habits = await HabitsCollection.find({ user_id: new ObjectId(user_id), type }).toArray();
+
+    if (query_depth === "filtered") {
+      let filteredHabits = [];
+      const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
+      const today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+      for (const habit of habits) {
+        if (!habit.redemptions_per_day) {
+          filteredHabits.push(habit);
+          continue;
+        }
+        const transactions = await TransactionsCollection.find({ habit_id: habit._id, date: { $gt: today } }).toArray();
+        if (transactions.length < habit.redemptions_per_day) {
+          filteredHabits.push(habit);
+        }
+      }
+      return res.sendStatus(filteredHabits);
+    }
+
     return res.send(habits);
   } catch (error) {
     return res.status(400).send(error.message);
