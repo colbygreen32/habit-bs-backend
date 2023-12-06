@@ -24,8 +24,8 @@ app.get("/get-habits", async (req, res) => {
 
     let habits = await HabitsCollection.find({ user_id: new ObjectId(user_id), type }).toArray();
 
+    let filteredHabits = [];
     if (query_depth === "filtered") {
-      let filteredHabits = [];
       const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
       const today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
       for (const habit of habits) {
@@ -38,10 +38,9 @@ app.get("/get-habits", async (req, res) => {
           filteredHabits.push(habit);
         }
       }
-      return res.send(filteredHabits);
     }
 
-    return res.send(habits);
+    return res.send(query_depth === "filtered" ? filteredHabits : habits);
   } catch (error) {
     return res.status(400).send(error.message);
   } finally {
