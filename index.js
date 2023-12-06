@@ -36,7 +36,7 @@ app.get("/get-habits", async (req, res) => {
           filteredHabits.push(habit);
         }
       }
-      return res.sendStatus(filteredHabits);
+      return res.send(filteredHabits);
     }
 
     return res.send(habits);
