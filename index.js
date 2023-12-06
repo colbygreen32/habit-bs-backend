@@ -19,7 +19,6 @@ app.get("/get-habits", async (req, res) => {
   try {
     const { type, user_id, query_depth = "filtered" } = req.query;
 
-    console.log(type, user_id, query_depth);
     const HabitsCollection = mongo.db("HabitBS").collection("Habits");
 
     let habits = await HabitsCollection.find({ user_id: new ObjectId(user_id), type }).toArray();
@@ -31,7 +30,6 @@ app.get("/get-habits", async (req, res) => {
       const date = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
       const localDate = new Date(date);
       const today = new Date(localDate.getFullYear(), localDate.getMonth(), localDate.getDate());
-      console.log(today);
       for (const habit of habits) {
         if (!habit.redemptions_per_day) {
           filteredHabits.push(habit);
