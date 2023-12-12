@@ -98,10 +98,10 @@ app.post("/complete-habit", jsonParser, async (req, res) => {
 
     const habit = await HabitsCollection.findOne({ _id: habitObjectId });
 
-    console.log("complete-habit", habit.name, ip);
-
     const user = await UsersCollection.findOne({ _id: new ObjectId(user_id) });
     if (!user) throw new Error("No user found");
+
+    console.log("complete-habit", user.user_name, habit.name, ip);
 
     let amount = habit.type === "positive" ? habit.amount : habit.amount * -1;
     if (hours) {
