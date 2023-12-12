@@ -85,6 +85,8 @@ app.get("/get-user", async (req, res) => {
 });
 
 app.post("/complete-habit", jsonParser, async (req, res) => {
+  console.log("complete-habit");
+  console.log(req);
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   try {
     const { habitId, hours } = req.body;
