@@ -85,8 +85,7 @@ app.get("/get-user", async (req, res) => {
 });
 
 app.post("/complete-habit", jsonParser, async (req, res) => {
-  console.log("complete-habit");
-  console.log(req);
+  const ip = req.headers["true-client-ip"];
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   try {
     const { habitId, hours } = req.body;
@@ -98,6 +97,8 @@ app.post("/complete-habit", jsonParser, async (req, res) => {
     const UsersCollection = mongo.db("HabitBS").collection("Users");
 
     const habit = await HabitsCollection.findOne({ _id: habitObjectId });
+
+    console.log("complete-habit", habit.name, ip);
 
     const user = await UsersCollection.findOne({ _id: new ObjectId(user_id) });
     if (!user) throw new Error("No user found");
