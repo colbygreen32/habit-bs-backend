@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { MongoClient, ObjectId } from "mongodb";
 import cors from "cors";
 import bodyParser from "body-parser";
+import util from "@mdi/util";
 
 var jsonParser = bodyParser.json();
 dotenv.config();
@@ -12,6 +13,11 @@ const port = 8080;
 
 app.get("/test", async (req, res) => {
   return res.send("Test Success");
+});
+
+app.get("/icons", async (req, res) => {
+  let icons = util.getMeta(true);
+  return res.send(icons);
 });
 
 app.get("/get-habits", async (req, res) => {

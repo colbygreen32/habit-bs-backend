@@ -11,6 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.421.0",
+    "@mdi/svg": "^7.3.67",
+    "@mdi/util": "^0.3.2",
     "aws-sdk": "^2.1454.0",
     "axios": "^1.5.0",
     "cors": "^2.8.5",
