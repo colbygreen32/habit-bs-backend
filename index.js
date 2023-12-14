@@ -17,6 +17,7 @@ app.get("/test", async (req, res) => {
 
 app.get("/icons", async (req, res) => {
   let icons = util.getMeta(true);
+  icons = icons.filter((icon) => !icon.deprecated);
   return res.send(icons);
 });
 
