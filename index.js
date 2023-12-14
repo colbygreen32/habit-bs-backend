@@ -32,7 +32,6 @@ app.get("/get-habits", async (req, res) => {
 
     let filteredHabits = [];
     if (query_depth == "filtered") {
-      console.log("filtered hit");
       const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
       const date = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
       const localDate = new Date(date);
