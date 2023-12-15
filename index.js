@@ -18,6 +18,13 @@ app.get("/test", async (req, res) => {
 app.get("/icons", async (req, res) => {
   let icons = util.getMeta(true);
   icons = icons.filter((icon) => !icon.deprecated);
+  // const categories = new Set();
+
+  // for (const icon of icons) {
+  //   for (const tag of icon.tags) {
+  //     categories.add(tag);
+  //   }
+  // }
   return res.send(icons);
 });
 
@@ -92,6 +99,11 @@ app.get("/get-user", async (req, res) => {
 
 app.post("/complete-habit", jsonParser, async (req, res) => {
   const ip = req.headers["true-client-ip"];
+  // Idk what this ip is from but its fuqing with my shit so ignore all request from it
+  if (ip === "139.178.131.21") {
+    console.log(ip, "on that bullshit again");
+    res.send("Nah bruh");
+  }
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   try {
     const { habitId, hours } = req.body;
