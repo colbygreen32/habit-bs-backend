@@ -99,7 +99,8 @@ app.get("/get-user", async (req, res) => {
 
 app.post("/complete-habit", jsonParser, async (req, res) => {
   const ip = req.headers["true-client-ip"];
-  // Idk what this ip is from but its fuqing with my shit so ignore all request from it
+
+  // idk what this ip is from but its fuqing with my shit so ignore all request from it
   if (ip === "139.178.131.21") {
     console.log(ip, "on that bullshit again");
     res.send("Nah bruh");
