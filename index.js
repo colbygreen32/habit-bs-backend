@@ -97,6 +97,28 @@ app.get("/get-user", async (req, res) => {
   }
 });
 
+app.post("/create-habit", jsonParser, async (req, res) => {
+  const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
+  try {
+    const { type, name, amount, icon } = req.body;
+    const { user_id } = req.query;
+
+    const HabitsCollection = mongo.db("HabitBS").collection("Habits");
+
+    await HabitsCollection.insertOne({
+      type,
+      name,
+      amount,
+      icon,
+      user_id: new ObjectId(user_id)
+    });
+
+    return res.send("Success");
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+});
+
 app.post("/complete-habit", jsonParser, async (req, res) => {
   const ip = req.headers["true-client-ip"];
 
