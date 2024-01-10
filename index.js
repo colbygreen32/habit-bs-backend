@@ -123,7 +123,7 @@ app.post("/complete-habit", jsonParser, async (req, res) => {
   const ip = req.headers["true-client-ip"];
 
   // idk what this ip is from but its fuqing with my shit so ignore all request from it
-  if (ip === "139.178.131.21") {
+  if (ip === "139.178.131.21" || ip === "139.178.130.74") {
     console.log(ip, "on that bullshit again");
     return res.send("Nah bruh");
   }
