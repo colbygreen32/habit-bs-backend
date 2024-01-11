@@ -122,7 +122,7 @@ app.post("/habit", jsonParser, async (req, res) => {
 app.put("/habit", jsonParser, async (req, res) => {
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   try {
-    const { type, name, amount, icon } = req.body;
+    const { name, amount, icon } = req.body;
     const { habit_id } = req.query;
 
     const HabitsCollection = mongo.db("HabitBS").collection("Habits");
