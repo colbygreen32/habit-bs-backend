@@ -132,9 +132,11 @@ app.put("/habit", jsonParser, async (req, res) => {
         _id: new ObjectId(habit_id)
       },
       {
-        name,
-        amount,
-        icon
+        $set: {
+          name,
+          amount,
+          icon
+        }
       }
     );
 
