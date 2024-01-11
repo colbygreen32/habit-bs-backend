@@ -146,6 +146,23 @@ app.put("/habit", jsonParser, async (req, res) => {
   }
 });
 
+app.delete("/habit", jsonParser, async (req, res) => {
+  const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
+  try {
+    const { habit_id } = req.query;
+
+    const HabitsCollection = mongo.db("HabitBS").collection("Habits");
+
+    await HabitsCollection.deleteOne({
+      _id: new ObjectId(habit_id)
+    });
+
+    return res.send("Success");
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+});
+
 app.post("/complete-habit", jsonParser, async (req, res) => {
   const ip = req.headers["true-client-ip"];
 
