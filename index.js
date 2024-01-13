@@ -83,9 +83,9 @@ app.get("/transactions", async (req, res) => {
 app.get("/get-user", async (req, res) => {
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   try {
-    const { user_id } = req.query;
+    const { apple_id } = req.query;
     const UsersCollection = mongo.db("HabitBS").collection("Users");
-    const user = await UsersCollection.findOne({ _id: new ObjectId(user_id) });
+    const user = await UsersCollection.findOne({ apple_id });
     if (!user) {
       return res.status(400).send("Error");
     }
