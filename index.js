@@ -4,6 +4,7 @@ import { MongoClient, ObjectId } from "mongodb";
 import cors from "cors";
 import bodyParser from "body-parser";
 import util from "@mdi/util";
+import { format } from "date-fns";
 
 var jsonParser = bodyParser.json();
 dotenv.config();
@@ -73,6 +74,47 @@ app.get("/transactions", async (req, res) => {
       .toArray();
 
     return res.send(transactions);
+  } catch (error) {
+    return res.status(400).send(error.message);
+  } finally {
+    await mongo.close();
+  }
+});
+
+function groupBy(list, keyGetter) {
+  const obj = {};
+  list.forEach((item) => {
+    const key = keyGetter(item);
+    if (!obj[key]) {
+      obj[key] = [item];
+    } else {
+      obj[key].push(item);
+    }
+  });
+  return obj;
+}
+
+app.get("/calendar-groups", async (req, res) => {
+  const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
+  try {
+    const { user_id } = req.query;
+    const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
+    const transactions = await TransactionsCollection.find({ user_id: new ObjectId(user_id) })
+      .sort({ date: -1 })
+      .toArray();
+
+    const groups = groupBy(transactions, (transaction) => format(transaction.date, "yyyy-LL-dd"));
+
+    const finalGroups = {};
+    for (const [key, transactions] of Object.entries(groups)) {
+      const total = transactions.reduce((accumulator, transaction) => accumulator + transaction.amount, 0);
+      finalGroups[key] = {
+        total,
+        transactions
+      };
+    }
+
+    return res.send(finalGroups);
   } catch (error) {
     return res.status(400).send(error.message);
   } finally {
