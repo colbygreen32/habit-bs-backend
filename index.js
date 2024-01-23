@@ -4,7 +4,7 @@ import { MongoClient, ObjectId } from "mongodb";
 import cors from "cors";
 import bodyParser from "body-parser";
 import util from "@mdi/util";
-import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 
 var jsonParser = bodyParser.json();
 dotenv.config();
@@ -103,8 +103,8 @@ app.get("/calendar-groups", async (req, res) => {
       .sort({ date: -1 })
       .toArray();
 
-    const groups = groupBy(transactions, (transaction) => format(transaction.date, "yyyy-LL-dd"));
-
+    const timeZone = "America/New_York";
+    const groups = groupBy(transactions, (transaction) => formatInTimeZone(transaction.date, timeZone, "yyyy-MM-dd"));
     const finalGroups = {};
     for (const [key, transactions] of Object.entries(groups)) {
       const total = transactions.reduce((accumulator, transaction) => accumulator + transaction.amount, 0);
