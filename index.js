@@ -138,6 +138,8 @@ app.get("/get-user", async (req, res) => {
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   try {
     const { apple_id } = req.query;
+
+    console.log(apple_id);
     const UsersCollection = mongo.db("HabitBS").collection("Users");
     const user = await UsersCollection.findOne({ apple_id });
     if (!user) {
