@@ -4,7 +4,7 @@ import { MongoClient, ObjectId } from "mongodb";
 import cors from "cors";
 import bodyParser from "body-parser";
 import util from "@mdi/util";
-import { formatInTimeZone } from "date-fns-tz";
+import { formatInTimeZone, zonedTimeToUtc } from "date-fns-tz";
 
 var jsonParser = bodyParser.json();
 dotenv.config();
@@ -67,11 +67,23 @@ app.get("/get-habits", async (req, res) => {
 app.get("/transactions", async (req, res) => {
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   try {
-    const { user_id } = req.query;
+    const { user_id, date } = req.query;
     const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
-    const transactions = await TransactionsCollection.find({ user_id: new ObjectId(user_id) })
-      .sort({ date: -1 })
-      .toArray();
+
+    const match = {
+      user_id: new ObjectId(user_id)
+    };
+
+    if (date) {
+      const startDate = zonedTimeToUtc(date, "America/New_York");
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + 1);
+      match.date = {
+        $gte: startDate,
+        $lt: endDate
+      };
+    }
+    const transactions = await TransactionsCollection.find(match).sort({ date: -1 }).toArray();
 
     return res.send(transactions);
   } catch (error) {
