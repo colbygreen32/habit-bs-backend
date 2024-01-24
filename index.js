@@ -93,6 +93,23 @@ app.get("/transactions", async (req, res) => {
   }
 });
 
+app.delete("/transactions", jsonParser, async (req, res) => {
+  const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
+  try {
+    const { transaction_id } = req.query;
+
+    const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
+
+    await TransactionsCollection.deleteOne({
+      _id: new ObjectId(transaction_id)
+    });
+
+    return res.send("Success");
+  } catch (error) {
+    return res.status(400).send(error.message);
+  }
+});
+
 function groupBy(list, keyGetter) {
   const obj = {};
   list.forEach((item) => {
