@@ -170,6 +170,22 @@ app.get("/get-user", async (req, res) => {
   }
 });
 
+app.get("/users", async (req, res) => {
+  const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
+  try {
+    const { query, user_id } = req.query;
+
+    const UsersCollection = mongo.db("HabitBS").collection("Users");
+    const users = await UsersCollection.find({ user_name: new RegExp(query, "i"), _id: { $ne: new ObjectId(user_id) } }).toArray();
+
+    return res.send(users);
+  } catch (error) {
+    return res.status(400).send(error.message);
+  } finally {
+    await mongo.close();
+  }
+});
+
 app.post("/habit", jsonParser, async (req, res) => {
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   try {
