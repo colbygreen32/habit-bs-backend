@@ -96,13 +96,16 @@ app.get("/transactions", async (req, res) => {
 app.delete("/transactions", jsonParser, async (req, res) => {
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   try {
-    const { transaction_id } = req.query;
+    const { user_id, transaction_id } = req.query;
 
     const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
+    const UsersCollection = mongo.db("HabitBS").collection("Users");
 
-    await TransactionsCollection.deleteOne({
+    const transaction = await TransactionsCollection.findOneAndDelete({
       _id: new ObjectId(transaction_id)
     });
+
+    await UsersCollection.updateOne({ _id: new ObjectId(user_id) }, { $inc: { balance: transaction.amount * -1 } });
 
     return res.send("Success");
   } catch (error) {
