@@ -166,7 +166,7 @@ app.post("/send-friend-request", async (req, res) => {
       friend_id: new ObjectId(friend_id),
       status: "requested"
     });
-    return res.send(user);
+    return res.send("Success");
   } catch (error) {
     return res.status(400).send(error.message);
   } finally {
