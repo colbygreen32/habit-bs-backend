@@ -199,7 +199,14 @@ app.get("/users", async (req, res) => {
     const { query, user_id } = req.query;
 
     const UsersCollection = mongo.db("HabitBS").collection("Users");
+    const UserRelationshipsCollection = mongo.db("HabitBS").collection("UserRelationships");
+    const relationships = await UserRelationshipsCollection.find({ $or: [{ requester_id: new ObjectId(user_id) }, { friend_id: new ObjectId(user_id) }] }).toArray();
     const users = await UsersCollection.find({ user_name: new RegExp(query, "i"), _id: { $ne: new ObjectId(user_id) } }).toArray();
+
+    for (const user of users) {
+      const relationship = relationships.find((relation) => relation.requester_id.toString() === user._id.toString() || relation.friend_id.toString() === user._id.toString());
+      user.status = relationship?.status;
+    }
 
     return res.send(users);
   } catch (error) {
