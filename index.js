@@ -154,6 +154,26 @@ app.get("/calendar-groups", async (req, res) => {
   }
 });
 
+app.post("/send-friend-request", async (req, res) => {
+  const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
+  try {
+    const { requester_id, friend_id } = req.query;
+
+    const UserRelationshipsCollection = mongo.db("HabitBS").collection("UserRelationships");
+
+    await UserRelationshipsCollection.insertOne({
+      requester_id: new ObjectId(requester_id),
+      friend_id: new ObjectId(friend_id),
+      status: "requested"
+    });
+    return res.send(user);
+  } catch (error) {
+    return res.status(400).send(error.message);
+  } finally {
+    await mongo.close();
+  }
+});
+
 app.get("/get-user", async (req, res) => {
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   try {
