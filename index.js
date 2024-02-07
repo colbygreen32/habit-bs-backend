@@ -186,7 +186,8 @@ app.get("/friends", async (req, res) => {
     let friends = [];
     for (const relationship of relationships) {
       let friend_id = relationship.friend_id.toString() === user_id ? relationship.requester_id : relationship.friend_id;
-      const friend = await UsersCollection.findOne({ _id: friend_id });
+      let friend = await UsersCollection.findOne({ _id: friend_id });
+      friend.status = relationship.status;
       if (!friend) continue;
       friends.push(friend);
     }
