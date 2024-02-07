@@ -174,6 +174,31 @@ app.post("/send-friend-request", async (req, res) => {
   }
 });
 
+app.get("/friends", async (req, res) => {
+  const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
+  try {
+    const { user_id } = req.query;
+
+    const UsersCollection = mongo.db("HabitBS").collection("Users");
+    const UserRelationshipsCollection = mongo.db("HabitBS").collection("UserRelationships");
+    const relationships = await UserRelationshipsCollection.find({ $or: [{ requester_id: new ObjectId(user_id) }, { friend_id: new ObjectId(user_id) }] }).toArray();
+
+    let friends = [];
+    for (const relationship of relationships) {
+      let friend_id = relationship.friend_id.toString() === user_id ? relationship.requester_id : relationship.friend_id;
+      const friend = await UsersCollection.findOne({ _id: friend_id });
+      if (!friend) continue;
+      friends.push(friend);
+    }
+
+    return res.send(friends);
+  } catch (error) {
+    return res.status(400).send(error.message);
+  } finally {
+    await mongo.close();
+  }
+});
+
 app.get("/get-user", async (req, res) => {
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   try {
