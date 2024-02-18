@@ -206,12 +206,8 @@ app.post("/send-money", jsonParser, async (req, res) => {
     const { user_id } = req.query;
     const { friend_id, amount } = req.body;
 
-    console.log(req.body);
-
     const UsersCollection = mongo.db("HabitBS").collection("Users");
     const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
-
-    console.log(user_id, friend_id);
 
     const user = await UsersCollection.findOne({ _id: new ObjectId(user_id) });
     const friend = await UsersCollection.findOne({ _id: new ObjectId(friend_id) });
@@ -273,6 +269,7 @@ app.get("/get-user", async (req, res) => {
     }
     return res.send(user);
   } catch (error) {
+    console.log(error);
     return res.status(400).send(error.message);
   } finally {
     await mongo.close();
@@ -296,6 +293,7 @@ app.get("/users", async (req, res) => {
 
     return res.send(users);
   } catch (error) {
+    console.log(error);
     return res.status(400).send(error.message);
   } finally {
     await mongo.close();
@@ -320,6 +318,7 @@ app.post("/habit", jsonParser, async (req, res) => {
 
     return res.send("Success");
   } catch (error) {
+    console.log(error);
     return res.status(400).send(error.message);
   }
 });
@@ -347,6 +346,7 @@ app.put("/habit", jsonParser, async (req, res) => {
 
     return res.send("Success");
   } catch (error) {
+    console.log(error);
     return res.status(400).send(error.message);
   }
 });
@@ -364,6 +364,7 @@ app.delete("/habit", jsonParser, async (req, res) => {
 
     return res.send("Success");
   } catch (error) {
+    console.log(error);
     return res.status(400).send(error.message);
   }
 });
@@ -417,6 +418,7 @@ app.post("/complete-habit", jsonParser, async (req, res) => {
 
     return res.send("Success");
   } catch (error) {
+    console.log(error);
     return res.status(400).send(error.message);
   } finally {
     await mongo.close();
@@ -440,6 +442,7 @@ app.post("/reset-transactions", jsonParser, async (req, res) => {
 
     return res.send("Success");
   } catch (error) {
+    console.log(error);
     return res.status(400).send(error.message);
   } finally {
     await mongo.close();
