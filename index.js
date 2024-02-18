@@ -206,6 +206,8 @@ app.post("/send-money", jsonParser, async (req, res) => {
     const { user_id } = req.query;
     const { friend_id, amount } = req.body;
 
+    console.log(req.body);
+
     const UsersCollection = mongo.db("HabitBS").collection("Users");
     const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
 
