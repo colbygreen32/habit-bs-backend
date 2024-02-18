@@ -200,6 +200,61 @@ app.get("/friends", async (req, res) => {
   }
 });
 
+app.post("/send-money", jsonParser, async (req, res) => {
+  const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
+  try {
+    const { user_id } = req.query;
+    const { friend_id, amount } = req.body;
+
+    const UsersCollection = mongo.db("HabitBS").collection("Users");
+    const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
+
+    const user = await UsersCollection.findOne({ _id: new ObjectId(user_id) });
+    const friend = await UsersCollection.findOne({ _id: new ObjectId(friend_id) });
+
+    if (!user || !friend) throw new Error("User not found");
+
+    const userNewBalance = user.balance - amount;
+    const friendNewBalance = friend.balance + amount;
+
+    // user
+    await TransactionsCollection.insertOne({
+      habit_name: `Money Sent to ${friend.user_name}`,
+      amount: amount,
+      icon: "account",
+      credit: false,
+      user_id: new ObjectId(user_id),
+      date: new Date(),
+      type: "money-sent",
+      balance_after_transaction: userNewBalance,
+      balance_before_transaction: user.balance
+    });
+
+    await UsersCollection.updateOne({ _id: user._id }, { $inc: { balance: amount * -1 } });
+
+    // friend
+    await TransactionsCollection.insertOne({
+      habit_name: `Money Sent from ${user.user_name}`,
+      amount: amount,
+      icon: "account",
+      credit: true,
+      user_id: new ObjectId(friend_id),
+      date: new Date(),
+      type: "money-sent",
+      balance_after_transaction: friendNewBalance,
+      balance_before_transaction: friend.balance
+    });
+
+    await UsersCollection.updateOne({ _id: friend._id }, { $inc: { balance: amount } });
+
+    return res.send("Success");
+  } catch (error) {
+    return res.status(400).send(error.message);
+  } finally {
+    await mongo.close();
+  }
+});
+
 app.get("/get-user", async (req, res) => {
   const mongo = await MongoClient.connect("mongodb+srv://colbyjgreen32:9IXrPtWMHvBdICx5@cluster0.f3he31n.mongodb.net");
   try {
