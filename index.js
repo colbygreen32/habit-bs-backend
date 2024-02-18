@@ -209,6 +209,8 @@ app.post("/send-money", jsonParser, async (req, res) => {
     const UsersCollection = mongo.db("HabitBS").collection("Users");
     const TransactionsCollection = mongo.db("HabitBS").collection("Transactions");
 
+    console.log(user_id, friend_id);
+
     const user = await UsersCollection.findOne({ _id: new ObjectId(user_id) });
     const friend = await UsersCollection.findOne({ _id: new ObjectId(friend_id) });
 
