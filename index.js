@@ -249,6 +249,7 @@ app.post("/send-money", jsonParser, async (req, res) => {
 
     return res.send("Success");
   } catch (error) {
+    console.log(error);
     return res.status(400).send(error.message);
   } finally {
     await mongo.close();
