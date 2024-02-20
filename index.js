@@ -139,7 +139,7 @@ app.get("/calendar-groups", async (req, res) => {
     const groups = groupBy(transactions, (transaction) => formatInTimeZone(transaction.date, timeZone, "yyyy-MM-dd"));
     const finalGroups = {};
     for (const [key, transactions] of Object.entries(groups)) {
-      const total = transactions.reduce((accumulator, transaction) => accumulator + transaction.amount, 0);
+      const total = transactions.reduce((accumulator, transaction) => accumulator + transaction.amount * (transaction.credit ? 1 : -1), 0);
       finalGroups[key] = {
         total,
         transactions
