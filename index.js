@@ -5,12 +5,15 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import util from "@mdi/util";
 import { formatInTimeZone, zonedTimeToUtc } from "date-fns-tz";
+import events from "./events.js";
 
 var jsonParser = bodyParser.json();
 dotenv.config();
 const app = express();
 app.use(cors());
 const port = 8080;
+
+app.use("/events", events);
 
 app.get("/test", async (req, res) => {
   return res.send("Test Success");
